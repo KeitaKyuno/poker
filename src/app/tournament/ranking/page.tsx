@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { BackButton } from '@/components/back-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,10 +14,18 @@ export default function TournamentRankingPage() {
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      const response = await fetch('/api/tournaments/ranking')
-      const data = await response.json()
-      setRankings(data.rankings ?? [])
-      setLoading(false)
+      try {
+        const response = await fetch('/api/tournaments/ranking')
+        if (!response.ok) {
+          throw new Error('取得に失敗しました')
+        }
+        const data = await response.json()
+        setRankings(data.rankings ?? [])
+      } catch {
+        toast.error('取得に失敗しました')
+      } finally {
+        setLoading(false)
+      }
     }
 
     void load()

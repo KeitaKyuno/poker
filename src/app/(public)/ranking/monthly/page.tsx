@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { BackButton } from '@/components/back-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,10 +23,18 @@ export default function MonthlyRankingPage() {
   useEffect(() => {
     const loadOverall = async () => {
       setOverallLoading(true)
-      const response = await fetch('/api/rankings/overall')
-      const data = await response.json()
-      setOverallRankings(data.rankings ?? [])
-      setOverallLoading(false)
+      try {
+        const response = await fetch('/api/rankings/overall')
+        if (!response.ok) {
+          throw new Error('取得に失敗しました')
+        }
+        const data = await response.json()
+        setOverallRankings(data.rankings ?? [])
+      } catch {
+        toast.error('取得に失敗しました')
+      } finally {
+        setOverallLoading(false)
+      }
     }
 
     void loadOverall()
@@ -34,10 +43,18 @@ export default function MonthlyRankingPage() {
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      const response = await fetch(`/api/rankings/monthly?yearMonth=${yearMonth}`)
-      const data = await response.json()
-      setRankings(data.rankings ?? [])
-      setLoading(false)
+      try {
+        const response = await fetch(`/api/rankings/monthly?yearMonth=${yearMonth}`)
+        if (!response.ok) {
+          throw new Error('取得に失敗しました')
+        }
+        const data = await response.json()
+        setRankings(data.rankings ?? [])
+      } catch {
+        toast.error('取得に失敗しました')
+      } finally {
+        setLoading(false)
+      }
     }
 
     void load()

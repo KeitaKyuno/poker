@@ -217,6 +217,7 @@ export default function TournamentSetupPage() {
       setTargetTournamentId(found.id)
       await refreshAvailablePlayers(found.id, allPlayers)
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : '取得に失敗しました')
       setAddMessage(error instanceof Error ? error.message : '取得に失敗しました')
     } finally {
       setFindingTournament(false)
