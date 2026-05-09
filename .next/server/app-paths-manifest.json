@@ -1,0 +1,6 @@
+{
+  "/api/players/route": "app/api/players/route.js",
+  "/page": "app/page.js",
+  "/tournament/setup/page": "app/tournament/setup/page.js",
+  "/(write)/sessions/start/page": "app/(write)/sessions/start/page.js"
+}

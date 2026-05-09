@@ -1,0 +1,85 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+:root {
+  --background: #07180f;
+  --foreground: #f8f2dc;
+  --card: #0e2217;
+  --card-foreground: #f8f2dc;
+  --popover: #0f2017;
+  --popover-foreground: #f8f2dc;
+  --primary: #d4af37;
+  --primary-foreground: #1b1504;
+  --secondary: #153325;
+  --secondary-foreground: #f5ead0;
+  --muted: #173426;
+  --muted-foreground: #d8ccaf;
+  --accent: #e5c866;
+  --accent-foreground: #1b1504;
+  --destructive: #be2f4a;
+  --border: #8c7329;
+  --input: #23402f;
+  --ring: #d4af37;
+  --radius: 0.8rem;
+}
+
+.dark {
+  --background: #07180f;
+  --foreground: #f8f2dc;
+  --card: #0e2217;
+  --card-foreground: #f8f2dc;
+  --popover: #0f2017;
+  --popover-foreground: #f8f2dc;
+  --primary: #d4af37;
+  --primary-foreground: #1b1504;
+  --secondary: #153325;
+  --secondary-foreground: #f5ead0;
+  --muted: #173426;
+  --muted-foreground: #d8ccaf;
+  --accent: #e5c866;
+  --accent-foreground: #1b1504;
+  --destructive: #be2f4a;
+  --border: #8c7329;
+  --input: #23402f;
+  --ring: #d4af37;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.8);
+  --radius-md: calc(var(--radius) * 0.9);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.2);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at 10% 15%, rgb(212 175 55 / 10%) 0%, transparent 40%),
+      radial-gradient(circle at 85% 5%, rgb(255 245 200 / 6%) 0%, transparent 35%);
+  }
+}
