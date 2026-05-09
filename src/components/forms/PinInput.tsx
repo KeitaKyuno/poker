@@ -18,7 +18,6 @@ export const PinInput = React.forwardRef<HTMLInputElement, PinInputProps>(functi
       inputMode="numeric"
       maxLength={4}
       autoComplete="off"
-      pattern="[0-9]{4}"
       onChange={(event) => {
         const sanitized = event.target.value.replace(/\D/g, '').slice(0, 4)
         if (sanitized !== event.target.value) {
