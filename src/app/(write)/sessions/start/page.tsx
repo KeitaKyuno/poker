@@ -125,7 +125,7 @@ export default function StartSessionPage() {
             <div className="space-y-2">
               <Label>プレイヤー</Label>
               <Select value={playerId} onValueChange={setPlayerId}>
-                <SelectTrigger>
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="選択してください" />
                 </SelectTrigger>
                 <SelectContent>
