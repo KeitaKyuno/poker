@@ -148,7 +148,7 @@ export default function StartSessionPage() {
               <Input
                 id="sessionDate"
                 type="date"
-                className="min-w-0"
+                className="w-full appearance-none"
                 value={sessionDate}
                 onChange={(e) => setSessionDate(e.target.value)}
                 required

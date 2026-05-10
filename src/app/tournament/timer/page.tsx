@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { BackButton } from '@/components/back-button'
+import { Input } from '@/components/ui/input'
 import type { ApiErrorResponse, TournamentBlind, TournamentTimerState } from '@/types'
 
 type TournamentListItem = {
@@ -395,11 +396,11 @@ export default function TournamentTimerPage() {
 
       <section className="space-y-4 overflow-hidden rounded-xl border-2 border-white/80 bg-black/20 p-6">
         <p className="text-sm text-white/80">日付を選択して確認してください</p>
-        <input
+        <Input
           type="date"
           value={selectedDate}
           onChange={(event) => setSelectedDate(event.target.value)}
-          className="min-w-0 w-full rounded-xl border-2 border-white/70 bg-transparent px-4 py-3 text-white outline-none"
+          className="w-full appearance-none rounded-xl border-2 border-white/70 bg-transparent px-4 py-3 text-white outline-none"
         />
 
         <div className="grid grid-cols-2 gap-3">

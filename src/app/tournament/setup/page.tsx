@@ -272,7 +272,7 @@ export default function TournamentSetupPage() {
               <Input
                 id="date"
                 type="date"
-                className="min-w-0"
+                className="w-full appearance-none"
                 value={date}
                 onChange={(e) => {
                   setDate(e.target.value)

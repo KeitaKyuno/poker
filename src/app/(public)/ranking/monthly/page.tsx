@@ -131,6 +131,7 @@ export default function MonthlyRankingPage() {
               <Input
                 id="yearMonth"
                 type="month"
+                className="w-full appearance-none"
                 value={yearMonth}
                 onChange={(e) => setYearMonth(e.target.value)}
               />

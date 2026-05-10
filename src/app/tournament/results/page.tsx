@@ -125,7 +125,7 @@ export default function TournamentResultsPage() {
         <CardContent className="space-y-6">
           <div className="space-y-2 overflow-hidden">
             <Label htmlFor="date">日付</Label>
-            <Input id="date" type="date" className="min-w-0" value={date} onChange={(event) => setDate(event.target.value)} />
+            <Input id="date" type="date" className="w-full appearance-none" value={date} onChange={(event) => setDate(event.target.value)} />
           </div>
 
           <Button onClick={onSearch} disabled={loading || !date}>
