@@ -393,13 +393,13 @@ export default function TournamentTimerPage() {
 
       <h1 className="text-2xl font-semibold">トーナメントタイマー</h1>
 
-      <section className="space-y-4 rounded-xl border-2 border-white/80 bg-black/20 p-6">
+      <section className="space-y-4 overflow-hidden rounded-xl border-2 border-white/80 bg-black/20 p-6">
         <p className="text-sm text-white/80">日付を選択して確認してください</p>
         <input
           type="date"
           value={selectedDate}
           onChange={(event) => setSelectedDate(event.target.value)}
-          className="w-full rounded-xl border-2 border-white/70 bg-transparent px-4 py-3 text-white outline-none"
+          className="min-w-0 w-full rounded-xl border-2 border-white/70 bg-transparent px-4 py-3 text-white outline-none"
         />
 
         <div className="grid grid-cols-2 gap-3">
