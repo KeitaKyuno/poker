@@ -123,9 +123,9 @@ export default function TournamentResultsPage() {
           <CardTitle>トーナメント順位登録</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
+          <div className="space-y-2 overflow-hidden">
             <Label htmlFor="date">日付</Label>
-            <Input id="date" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+            <Input id="date" type="date" className="min-w-0" value={date} onChange={(event) => setDate(event.target.value)} />
           </div>
 
           <Button onClick={onSearch} disabled={loading || !date}>

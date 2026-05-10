@@ -143,11 +143,12 @@ export default function StartSessionPage() {
               <PinInput id="pin" value={pin} onChange={(e) => setPin(e.target.value)} required />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-hidden">
               <Label htmlFor="sessionDate">日付</Label>
               <Input
                 id="sessionDate"
                 type="date"
+                className="min-w-0"
                 value={sessionDate}
                 onChange={(e) => setSessionDate(e.target.value)}
                 required

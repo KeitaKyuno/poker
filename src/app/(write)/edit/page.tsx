@@ -334,11 +334,12 @@ export default function EditPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 overflow-hidden">
               <Label htmlFor="date">日付</Label>
               <Input
                 id="date"
                 type="date"
+                className="min-w-0"
                 value={date}
                 onChange={(e) => {
                   setDate(e.target.value)

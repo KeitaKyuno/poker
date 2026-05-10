@@ -267,11 +267,12 @@ export default function TournamentSetupPage() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
-            <div className="max-w-xs space-y-2">
+            <div className="max-w-xs space-y-2 overflow-hidden">
               <Label htmlFor="date">日付</Label>
               <Input
                 id="date"
                 type="date"
+                className="min-w-0"
                 value={date}
                 onChange={(e) => {
                   setDate(e.target.value)
