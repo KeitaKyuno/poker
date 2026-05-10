@@ -35,11 +35,13 @@ export default function EditPage() {
   const [cashoutAmount, setCashoutAmount] = useState('')
   const [pin, setPin] = useState('')
   const [savingCash, setSavingCash] = useState(false)
+  const [deletingCash, setDeletingCash] = useState(false)
 
   const [tournamentId, setTournamentId] = useState('')
   const [currentRank, setCurrentRank] = useState<number | null>(null)
   const [newRank, setNewRank] = useState('')
   const [savingTournament, setSavingTournament] = useState(false)
+  const [deletingTournament, setDeletingTournament] = useState(false)
 
   useEffect(() => {
     const loadPlayers = async () => {
@@ -79,6 +81,14 @@ export default function EditPage() {
   const canSaveTournament = useMemo(() => {
     return Boolean(tournamentId) && Number(newRank) >= 1
   }, [tournamentId, newRank])
+
+  const canDeleteCash = useMemo(() => {
+    return Boolean(session) && pin.length === 4
+  }, [session, pin])
+
+  const canDeleteTournament = useMemo(() => {
+    return Boolean(tournamentId)
+  }, [tournamentId])
 
   const onSearch = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -210,6 +220,63 @@ export default function EditPage() {
     }
   }
 
+  const onDeleteCash = async () => {
+    if (!session) {
+      return
+    }
+
+    setDeletingCash(true)
+
+    try {
+      const response = await fetch(`/api/sessions/${session.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId, pin }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.error?.message ?? '削除に失敗しました')
+      }
+
+      setSession(null)
+      setCashoutAmount('')
+      toast.success('削除しました')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '削除に失敗しました')
+    } finally {
+      setDeletingCash(false)
+    }
+  }
+
+  const onDeleteTournament = async () => {
+    if (!tournamentId) {
+      return
+    }
+
+    setDeletingTournament(true)
+
+    try {
+      const response = await fetch(`/api/tournaments/${tournamentId}`, {
+        method: 'DELETE',
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data?.error?.message ?? '削除に失敗しました')
+      }
+
+      setTournamentId('')
+      setCurrentRank(null)
+      setNewRank('')
+      toast.success('削除しました')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '削除に失敗しました')
+    } finally {
+      setDeletingTournament(false)
+    }
+  }
+
   return (
     <main className="mx-auto w-full max-w-md px-4 py-8">
       <BackButton href="/" />
@@ -314,6 +381,15 @@ export default function EditPage() {
               <Button type="submit" className="w-full" disabled={!canSaveCash || savingCash}>
                 {savingCash ? '保存中...' : '保存'}
               </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-full"
+                onClick={() => void onDeleteCash()}
+                disabled={!canDeleteCash || deletingCash}
+              >
+                {deletingCash ? '削除中...' : '削除'}
+              </Button>
             </form>
           ) : null}
 
@@ -340,6 +416,15 @@ export default function EditPage() {
               </div>
               <Button type="submit" className="w-full" disabled={!canSaveTournament || savingTournament}>
                 {savingTournament ? '保存中...' : '保存'}
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-full"
+                onClick={() => void onDeleteTournament()}
+                disabled={!canDeleteTournament || deletingTournament}
+              >
+                {deletingTournament ? '削除中...' : '削除'}
               </Button>
             </form>
           ) : null}

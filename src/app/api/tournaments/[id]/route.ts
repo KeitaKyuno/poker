@@ -111,3 +111,30 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     },
   })
 }
+
+export async function DELETE(_: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params
+  const supabase = createServiceClient()
+
+  const { data: tournament, error: tournamentError } = await supabase
+    .from('tournaments')
+    .select('id')
+    .eq('id', id)
+    .maybeSingle<{ id: string }>()
+
+  if (tournamentError) {
+    return Errors.INTERNAL()
+  }
+
+  if (!tournament) {
+    return Errors.NOT_FOUND('Tournament not found')
+  }
+
+  const { error: deleteError } = await supabase.from('tournaments').delete().eq('id', id)
+
+  if (deleteError) {
+    return Errors.BAD_REQUEST(deleteError.message)
+  }
+
+  return NextResponse.json({ deletedTournamentId: id })
+}

@@ -163,3 +163,61 @@ export async function PATCH(request: Request, context: { params: Promise<{ sessi
 
   return NextResponse.json({ session: toSession(updatedSession, totalsRow) })
 }
+
+export async function DELETE(request: Request, context: { params: Promise<{ sessionId: string }> }) {
+  let parsed: { playerId: string; pin: string }
+
+  try {
+    const body = await request.json()
+    if (typeof body?.playerId !== 'string' || typeof body?.pin !== 'string') {
+      return Errors.BAD_REQUEST('Invalid request body')
+    }
+    parsed = { playerId: body.playerId, pin: body.pin }
+  } catch {
+    return Errors.BAD_REQUEST('Invalid request body')
+  }
+
+  const { sessionId } = await context.params
+  const supabase = createServiceClient()
+
+  const { data: sessionRow, error: sessionError } = await supabase
+    .from('sessions')
+    .select('id,player_id')
+    .eq('id', sessionId)
+    .maybeSingle<{ id: string; player_id: string }>()
+
+  if (sessionError) {
+    return Errors.INTERNAL()
+  }
+
+  if (!sessionRow) {
+    return Errors.NOT_FOUND('Session not found')
+  }
+
+  if (sessionRow.player_id !== parsed.playerId) {
+    return Errors.UNAUTHORIZED('Player mismatch')
+  }
+
+  const { data: playerRow, error: playerError } = await supabase
+    .from('players')
+    .select('password_hash')
+    .eq('id', parsed.playerId)
+    .maybeSingle<{ password_hash: string }>()
+
+  if (playerError || !playerRow) {
+    return Errors.INTERNAL()
+  }
+
+  const isValid = await verifyPin(parsed.pin, playerRow.password_hash)
+  if (!isValid) {
+    return Errors.INVALID_PIN()
+  }
+
+  const { error: deleteError } = await supabase.from('sessions').delete().eq('id', sessionId)
+
+  if (deleteError) {
+    return Errors.BAD_REQUEST(deleteError.message)
+  }
+
+  return NextResponse.json({ deletedSessionId: sessionId })
+}
