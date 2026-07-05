@@ -35,7 +35,10 @@ export async function GET(request: Request) {
 
   if (error) {
     console.error('[GET /api/tournaments]', error)
-    return Errors.INTERNAL()
+    return NextResponse.json(
+      { error: { code: 'INTERNAL_ERROR', message: error.message, hint: error.hint, details: error.details } },
+      { status: 500 }
+    )
   }
 
   const rows = (data ?? []) as TournamentRow[]
