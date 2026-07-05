@@ -53,33 +53,33 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     return Errors.NOT_FOUND('Tournament not found')
   }
 
-  const { data: entries, error: entriesError } = await supabase
+  const { data: entriesRaw, error: entriesError } = await supabase
     .from('tournament_entries')
     .select('player_id,starting_level,players(name)')
     .eq('tournament_id', id)
-    .returns<EntryRow[]>()
+  const entries = (entriesRaw ?? []) as unknown as EntryRow[]
 
   if (entriesError) {
     return Errors.INTERNAL()
   }
 
-  const { data: blinds, error: blindsError } = await supabase
+  const { data: blindsRaw, error: blindsError } = await supabase
     .from('tournament_blinds')
     .select('level,sb,bb,ante,duration_minutes')
     .eq('tournament_id', id)
     .order('level', { ascending: true })
-    .returns<BlindRow[]>()
+  const blinds = (blindsRaw ?? []) as BlindRow[]
 
   if (blindsError) {
     return Errors.INTERNAL()
   }
 
-  const { data: results, error: resultsError } = await supabase
+  const { data: resultsRaw, error: resultsError } = await supabase
     .from('tournament_results')
     .select('player_id,rank,players(name)')
     .eq('tournament_id', id)
     .order('rank', { ascending: true })
-    .returns<ResultRow[]>()
+  const results = (resultsRaw ?? []) as unknown as ResultRow[]
 
   if (resultsError) {
     return Errors.INTERNAL()
