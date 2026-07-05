@@ -39,14 +39,16 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
   const { id } = await context.params
   const supabase = createServiceClient()
 
-  const { data: tournament, error: tournamentError } = await supabase
+  const { data: tournamentRaw, error: tournamentError } = await supabase
     .from('tournaments')
     .select('id,date,created_at,timer_state')
     .eq('id', id)
-    .maybeSingle<TournamentRow>()
+    .maybeSingle()
+  const tournament = tournamentRaw as TournamentRow | null
 
   if (tournamentError) {
-    return Errors.INTERNAL()
+    console.error('[GET /api/tournaments/[id]] tournament:', tournamentError)
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: tournamentError.message } }, { status: 500 })
   }
 
   if (!tournament) {
@@ -60,7 +62,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
   const entries = (entriesRaw ?? []) as unknown as EntryRow[]
 
   if (entriesError) {
-    return Errors.INTERNAL()
+    console.error('[GET /api/tournaments/[id]] entries:', entriesError)
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: entriesError.message } }, { status: 500 })
   }
 
   const { data: blindsRaw, error: blindsError } = await supabase
@@ -71,7 +74,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
   const blinds = (blindsRaw ?? []) as BlindRow[]
 
   if (blindsError) {
-    return Errors.INTERNAL()
+    console.error('[GET /api/tournaments/[id]] blinds:', blindsError)
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: blindsError.message } }, { status: 500 })
   }
 
   const { data: resultsRaw, error: resultsError } = await supabase
@@ -82,7 +86,8 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
   const results = (resultsRaw ?? []) as unknown as ResultRow[]
 
   if (resultsError) {
-    return Errors.INTERNAL()
+    console.error('[GET /api/tournaments/[id]] results:', resultsError)
+    return NextResponse.json({ error: { code: 'INTERNAL_ERROR', message: resultsError.message } }, { status: 500 })
   }
 
   return NextResponse.json({
