@@ -7,6 +7,7 @@ import { PostTournamentsRequestSchema } from '@/lib/validation/schemas'
 type TournamentRow = {
   id: string
   date: string
+  status: 'active' | 'finished'
   created_at: string
 }
 
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
   const supabase = createServiceClient()
   let query = supabase
     .from('tournaments')
-    .select('id,date,created_at')
+    .select('id,date,status,created_at')
     .order('date', { ascending: false })
 
   if (statusParam) {
@@ -40,6 +41,7 @@ export async function GET(request: Request) {
     tournaments: (data ?? []).map((tournament) => ({
       id: tournament.id,
       date: tournament.date,
+      status: tournament.status,
       createdAt: tournament.created_at,
     })),
   })
@@ -79,6 +81,9 @@ export async function POST(request: Request) {
     .single<TournamentRow>()
 
   if (tournamentError || !tournament) {
+    if (tournamentError?.code === '23505') {
+      return Errors.BAD_REQUEST('この日付のトーナメントは既に存在します')
+    }
     return Errors.INTERNAL()
   }
 

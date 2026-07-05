@@ -24,6 +24,7 @@ type Mode = 'none' | 'new' | 'add'
 type TournamentSummary = {
   id: string
   date: string
+  status: 'active' | 'finished'
 }
 
 type TournamentDetail = {
@@ -185,7 +186,7 @@ export default function TournamentSetupPage() {
     setAddMessage('')
 
     try {
-      const tournamentsRes = await fetch('/api/tournaments?status=active')
+      const tournamentsRes = await fetch('/api/tournaments')
       const tournamentsData = await tournamentsRes.json()
 
       if (!tournamentsRes.ok) {
@@ -197,6 +198,11 @@ export default function TournamentSetupPage() {
 
       if (!found) {
         setMode('new')
+        return
+      }
+
+      if (found.status === 'finished') {
+        toast.error('この日付のトーナメントは既に終了しています')
         return
       }
 
