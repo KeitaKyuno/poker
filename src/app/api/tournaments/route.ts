@@ -31,14 +31,16 @@ export async function GET(request: Request) {
     query = query.eq('status', statusParam as TournamentStatus)
   }
 
-  const { data, error } = await query.returns<TournamentRow[]>()
+  const { data, error } = await query
 
   if (error) {
+    console.error('[GET /api/tournaments]', error)
     return Errors.INTERNAL()
   }
 
+  const rows = (data ?? []) as TournamentRow[]
   return NextResponse.json({
-    tournaments: (data ?? []).map((tournament) => ({
+    tournaments: rows.map((tournament) => ({
       id: tournament.id,
       date: tournament.date,
       status: tournament.status,
