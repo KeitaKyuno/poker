@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { v4 as uuidv4 } from 'uuid'
 
 import { verifyPin } from '@/lib/auth/pin'
 import { Errors } from '@/lib/api/response'
@@ -150,15 +149,23 @@ export async function POST(request: Request) {
       p_session_date: parsed.sessionDate,
       p_session_idempotency_key: parsed.idempotencyKey,
       p_buyin_amount: parsed.initialBuyinAmount,
-      p_buyin_idempotency_key: uuidv4(),
+      p_buyin_idempotency_key: parsed.buyinIdempotencyKey,
     })
     .single<CreateSessionWithBuyinRpcRow>()
 
-  if (rpcError?.message?.includes('DUPLICATE_SESSION')) {
+  if (rpcError?.code === 'P0001' && rpcError.message?.includes('DUPLICATE_SESSION')) {
     return Errors.SESSION_ALREADY_IN_PROGRESS()
   }
 
+  if (rpcError?.code === 'P0001' && rpcError.message?.includes('INVALID_AMOUNT')) {
+    return Errors.BAD_REQUEST('金額が不正です')
+  }
+
   if (rpcError?.code === '23505') {
+    if (rpcError.message?.includes('sessions_one_in_progress_per_player_idx')) {
+      return Errors.SESSION_ALREADY_IN_PROGRESS()
+    }
+
     return Errors.DUPLICATE_ENTRY()
   }
 

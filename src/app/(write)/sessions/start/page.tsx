@@ -70,12 +70,14 @@ export default function StartSessionPage() {
   }, [playerId])
 
   const canSubmit = useMemo(() => {
-    return playerId && pin.length === 4 && Number(initialBuyinAmount) > 0
-  }, [playerId, pin, initialBuyinAmount])
+    return !!playerId && pin.length === 4 && Number(initialBuyinAmount) > 0 && !inProgressSession
+  }, [playerId, pin, initialBuyinAmount, inProgressSession])
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setSubmitting(true)
+    const idempotencyKey = crypto.randomUUID()
+    const buyinIdempotencyKey = crypto.randomUUID()
 
     try {
       const response = await fetch('/api/sessions', {
@@ -86,7 +88,8 @@ export default function StartSessionPage() {
           pin,
           sessionDate,
           initialBuyinAmount: Number(initialBuyinAmount),
-          idempotencyKey: crypto.randomUUID(),
+          idempotencyKey,
+          buyinIdempotencyKey,
         }),
       })
 

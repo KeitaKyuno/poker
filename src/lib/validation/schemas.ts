@@ -16,6 +16,7 @@ export const PostSessionsRequestSchema = z.object({
   sessionDate: DateSchema,
   initialBuyinAmount: PositiveIntSchema,
   idempotencyKey: UUIDSchema,
+  buyinIdempotencyKey: UUIDSchema,
 })
 
 export const PostSessionBuyinsRequestSchema = z.object({
