@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { BackButton } from '@/components/back-button'
@@ -41,9 +42,19 @@ export default function TournamentStatsPage() {
     if (!playerId) return
 
     const load = async () => {
-      const response = await fetch(`/api/players/${playerId}/tournament-stats`)
-      const data = (await response.json()) as GetPlayerTournamentStatsResponse
-      setStats(data.stats ?? [])
+      try {
+        const response = await fetch(`/api/players/${playerId}/tournament-stats`)
+        const data = (await response.json()) as GetPlayerTournamentStatsResponse
+
+        if (!response.ok) {
+          throw new Error('トーナメント戦績の取得に失敗しました')
+        }
+
+        setStats(data.stats ?? [])
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'トーナメント戦績の取得に失敗しました')
+        setStats([])
+      }
     }
 
     void load()
@@ -59,7 +70,21 @@ export default function TournamentStatsPage() {
       }))
   }, [stats])
 
-  const maxPoints = useMemo(() => Math.max(...chartData.map((item) => item.points), 1), [chartData])
+  const yAxisDomain = useMemo<[number, number]>(() => {
+    if (chartData.length === 0) {
+      return [0, 1]
+    }
+
+    const values = chartData.map((item) => item.points)
+    const min = Math.min(...values, 0)
+    const max = Math.max(...values, 0)
+
+    if (min === max) {
+      return [min - 1, max + 1]
+    }
+
+    return [min, max]
+  }, [chartData])
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8">
@@ -84,7 +109,7 @@ export default function TournamentStatsPage() {
                 <LineChart data={chartData} margin={{ top: 8, right: 20, left: 8, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="label" />
-                  <YAxis domain={[0, maxPoints]} allowDecimals={false} />
+                  <YAxis domain={yAxisDomain} allowDecimals={false} />
                   <Tooltip
                     formatter={(value) => `${value}pt`}
                     labelFormatter={(_, payload) => {

@@ -40,8 +40,8 @@ export default function TournamentRankingPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded border border-primary/30 bg-primary/5 p-3 text-sm space-y-1">
-            <p>1位:10pt / 2位:5pt / 3位:3pt / 4位:2pt / 5位:1pt</p>
-            <p>6人以上参加で4位からポイント付与、8人以上参加で5位からポイント付与</p>
+            <p>対称配点方式（ゼロサム）: 獲得ポイント = 参加人数 − 2×着順 + 1</p>
+            <p>参加人数と順位に応じて上位はプラス、下位はマイナスになり、全員の合計は常に0になります。</p>
           </div>
           {loading ? <p className="text-sm text-muted-foreground">読み込み中...</p> : null}
           <div className="overflow-x-auto">
@@ -73,7 +73,17 @@ export default function TournamentRankingPage() {
                       </span>
                     </td>
                     <td className="py-2">{row.playerName}</td>
-                    <td className="py-2 font-medium text-emerald-400">{row.totalPoints} pt</td>
+                    <td
+                      className={
+                        row.totalPoints > 0
+                          ? 'py-2 font-medium text-green-600'
+                          : row.totalPoints < 0
+                            ? 'py-2 font-medium text-red-600'
+                            : 'py-2 font-medium text-muted-foreground'
+                      }
+                    >
+                      {row.totalPoints > 0 ? `+${row.totalPoints}` : row.totalPoints} pt
+                    </td>
                     <td className="py-2">{row.gameCount}</td>
                   </tr>
                 ))}

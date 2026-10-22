@@ -75,15 +75,45 @@ export const PostTournamentsRequestSchema = z.object({
 })
 
 export const PostTournamentResultsRequestSchema = z.object({
-  results: z.array(
-    z.object({
-      playerId: z.string().uuid(),
-      rank: z.number().int().min(1),
-    })
-  ),
+  results: z
+    .array(
+      z.object({
+        playerId: z.string().uuid(),
+        rank: z.number().int().positive(),
+      })
+    )
+    .min(1)
+    .superRefine((results, ctx) => {
+      const playerIds = new Set<string>()
+      const ranks = new Set<number>()
+
+      for (const result of results) {
+        if (playerIds.has(result.playerId)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'playerId must be unique',
+          })
+          break
+        }
+        playerIds.add(result.playerId)
+      }
+
+      for (const result of results) {
+        if (ranks.has(result.rank)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'rank must be unique',
+          })
+          break
+        }
+        ranks.add(result.rank)
+      }
+    }),
 })
 
 export const PostTournamentEntryRequestSchema = z.object({
   playerId: z.string().uuid(),
   startingLevel: z.number().int().min(1),
 })
+
+export const UuidSchema = UUIDSchema

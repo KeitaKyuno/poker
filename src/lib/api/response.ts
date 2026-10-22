@@ -12,6 +12,7 @@ export const Errors = {
   SESSION_ALREADY_IN_PROGRESS: () =>
     apiError('SESSION_ALREADY_IN_PROGRESS', 'Player already has an in-progress session', 409),
   DUPLICATE_ENTRY: () => apiError('DUPLICATE_ENTRY', 'Duplicate entry', 409),
+  CONFLICT: (msg: string) => apiError('CONFLICT', msg, 409),
   RATE_LIMITED: () => apiError('RATE_LIMITED', 'Too many requests', 429),
   BAD_REQUEST: (msg: string) => apiError('BAD_REQUEST', msg, 400),
   INTERNAL: () => apiError('INTERNAL_ERROR', 'Internal server error', 500),

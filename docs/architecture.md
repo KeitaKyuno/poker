@@ -258,6 +258,10 @@ Zodスキーマ例（テキスト表現）:
 ```yaml
 PostSessionBuyinsRequestSchema:
   type: object
+
+## 9. フェイルファスト原則（ランキング計算）
+- 計算処理の厳密性を担保するため、不完全なデータ（日付欠落やランク未定義等）を検知した場合は、一切のフォールバックを行わず明示的に 5xx エラーとして処理を中断する。
+- 本方針はトーナメント統計・ランキングの整合性を優先するための設計原則であり、欠損値の推測補完や暫定値代入は行わない。
   required: [playerId, pin, amount, idempotencyKey]
   properties:
     playerId: { type: string, format: uuid }
@@ -275,3 +279,18 @@ PatchSessionRequestSchema:
     status: { enum: [in_progress, closed] }
     totalCashoutAmount: { type: [integer, "null"], minimum: 0 }
 ```
+
+
+## 9. トーナメントランキング設計（ゼロサム）
+- ポイント計算ロジックの Single Source of Truth はDBビュー `public.v_tournament_entry_points` とする。
+- `public.v_tournament_entry_points` は `tournament_id / player_id / rank / entry_count / points` を返し、ポイント式 `entry_count - 2 * rank + 1` を適用する。
+- `public.v_tournament_ranking` は `public.v_tournament_entry_points` を集計して総合順位を算出し、計算式を再定義しない。
+- API `GET /api/players/[playerId]/tournament-stats` は `public.v_tournament_entry_points` の `points` を利用し、欠損データのフォールバックを行わず不整合時はエラーを返す。
+### トーナメント順位登録フロー
+- `POST /api/tournaments/[id]/results` は `submit_tournament_results` RPC を1回呼び出す。
+- RPC内でトーナメント存在、提出件数一致、参加者整合、プレイヤー重複なし、順位1..N連番・重複なしを検証する。
+- 検証通過時に `tournament_results` を大会単位で置換し、`tournaments.status` を `finished` に更新する。
+
+### トーナメントランキング集計
+- ランキングビューは `finished` 大会のみを対象にポイント集計する。
+- 同点は同順位（`RANK()`）で付与し、表示の安定化はAPI層でプレイヤー名昇順を適用する。

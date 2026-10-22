@@ -3,14 +3,6 @@ import { NextResponse } from 'next/server'
 import { Errors } from '@/lib/api/response'
 import { createServiceClient } from '@/lib/supabase/service'
 
-type MonthlyRankingRow = {
-  year_month: string
-  player_id: string
-  player_name: string
-  net_profit_sum: number
-  session_count: number
-}
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const yearMonth = searchParams.get('yearMonth')

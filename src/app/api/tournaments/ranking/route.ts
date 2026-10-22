@@ -17,6 +17,8 @@ export async function GET() {
   const { data, error } = await supabase
     .from('v_tournament_ranking')
     .select('rank,player_id,player_name,total_points,game_count')
+    .order('total_points', { ascending: false })
+    .order('player_name', { ascending: true })
     .returns<RankingRow[]>()
 
   if (error) {

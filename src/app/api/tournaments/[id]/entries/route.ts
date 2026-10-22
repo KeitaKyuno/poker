@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
 import { Errors } from '@/lib/api/response'
+import { TOURNAMENT_ERROR_CODES } from '@/lib/tournament-error-codes'
 import { createServiceClient } from '@/lib/supabase/service'
 import { PostTournamentEntryRequestSchema } from '@/lib/validation/schemas'
 
@@ -19,6 +20,24 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   }
 
   const supabase = createServiceClient()
+
+  const { data: tournament, error: tournamentError } = await supabase
+    .from('tournaments')
+    .select('status')
+    .eq('id', id)
+    .maybeSingle<{ status: 'active' | 'finished' }>()
+
+  if (tournamentError) {
+    return Errors.INTERNAL()
+  }
+
+  if (!tournament) {
+    return Errors.NOT_FOUND('トーナメントが見つかりません')
+  }
+
+  if (tournament.status === 'finished') {
+    return Errors.CONFLICT('終了済みトーナメントには参加者を追加できません')
+  }
 
   const { data: existingEntry, error: existingEntryError } = await supabase
     .from('tournament_entries')
@@ -42,7 +61,10 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   })
 
   if (insertError) {
-    return Errors.BAD_REQUEST(insertError.message)
+    if (insertError.code === TOURNAMENT_ERROR_CODES.TOURNAMENT_FINISHED_ENTRIES_LOCKED) {
+      return Errors.CONFLICT('終了済みトーナメントには参加者を追加できません')
+    }
+    return Errors.BAD_REQUEST('参加登録に失敗しました')
   }
 
   const { data: player, error: playerError } = await supabase
